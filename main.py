@@ -1,20 +1,6 @@
 import pymysql
 import webbrowser as o
 
-class Information():
-    def __init__(self,name,idS,idB,band,type,flag):
-        self.name= name
-        self.idS= idS
-        self.idB= idB
-        self.band= band
-        self.type= type
-        self.flag= flag
-    def show(self):
-        print(self.name)
-        print(self.type)
-        print(self.band)
-        print(self.flag)
-
 class DataBase:
     def __init__(self):
         self.connection = pymysql.connect(
@@ -179,7 +165,7 @@ def searchBands(dataBase):
         print("You haven´t bands")
 
 def searchSongs(dataBase):
-    name= input("NAME SONG: ")
+    name= input("NAME BAND: ")
     name= addplus(name)
     idSong = dataBase.searchIdbandUnion(name)
     if idSong != None:
