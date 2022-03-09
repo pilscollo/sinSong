@@ -20,7 +20,7 @@ class DataBase:
         self.connection = pymysql.connect(
             host = 'localhost',
             user='root',
-            password= '12345',
+            password= '',
             db= 'sinsong'
         )
         self.cursor= self.connection.cursor()
@@ -47,8 +47,9 @@ class DataBase:
             raise
     def addUnion(self,idBand,idSong):
         try:
-            sql = 'INSERT INTO `union` (`idSong`, `idBand`, `flag`) VALUES ({},{},{})'
-            sql= sql.format(idSong,str(idBand).replace(",",""),"(1)")
+            sql = 'INSERT INTO `union` (`idSong`, `idBand`) VALUES ({},{})'
+
+            sql= sql.format(str(idSong),str(idBand))
             self.cursor.execute(sql)
             self.connection.commit()
             print("ADD  UNION")
@@ -97,6 +98,7 @@ class DataBase:
 
     def searchIdbandUnion(self, name):
         id = self.searchIdBand(name)
+
         rta=id
         if id != None:
             sql = 'SELECT idSong FROM sinsong.union WHERE idBand= {}'
@@ -136,13 +138,16 @@ def addSong(dataBase):
     type= addplus(type.lower())
     link= addplus(link)
     idS= dataBase.searchIdSong(name)
-    if  idS is None:
+    if idS is None:
         dataBase.addSong(name,link)
         idS= dataBase.searchIdSong(name)
+
     idB= dataBase.searchIdBand(band)
+    print(idB)
     if idB is None:
         dataBase.addBand(band,type)
         idB = dataBase.searchIdBand(band)
+
 
 
 
@@ -161,7 +166,7 @@ def searchSong(database):
     name = addplus(name.lower())
     link= database.searchLinkSong(name)
     link= correction(link)
-    if link!= None:
+    if link!= "None":
         showSong(link)
     else:
         print("the song doesn´t exist")
@@ -170,12 +175,48 @@ def searchBands(dataBase):
     bands = dataBase.searchsBands()
     for i in range(len(bands)):
         print("*" + correction(bands[i]))
+    if bands== ():
+        print("You haven´t bands")
 
-def searchSongs(dataBase,name):
+def searchSongs(dataBase):
+    name= input("NAME SONG: ")
+    name= addplus(name)
     idSong = dataBase.searchIdbandUnion(name)
     if idSong != None:
         for i in range(len(idSong)):
             name = dataBase.searchSongWithid(idSong[i])
             print("*" + correction(name))
+    else:
+        print("This name is´t valid")
 
 
+def auxiInt(op):
+    rta= False
+    list=["1","2","3","4","5"]
+    for i in range(len(list)):
+        if op== list[i]:
+            rta= True
+    return rta
+def funtionprincipal(dataBase):
+    rta ="SI"
+
+    while rta == "SI":
+         op= input("1.open song\n2.show bands\n3.show songs\n4.add\n5.close\n")
+         if auxiInt(op):
+                op=int(op)
+                if op == 1:
+                 searchSong(dataBase)
+                elif op== 2:
+                    searchBands(dataBase)
+                elif op==3:
+                    searchSongs(dataBase)
+                elif op==4:
+                    addSong(dataBase)
+                elif op==5:
+                    rta="NO"
+                else:
+                    print("invalid")
+         else:
+            print("INVALID OPTION")
+
+funtionprincipal(dataBase)
