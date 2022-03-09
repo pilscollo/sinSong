@@ -1,4 +1,5 @@
 import pymysql
+import webbrowser as o
 
 class Information():
     def __init__(self,name,idS,idB,band,type,flag):
@@ -75,12 +76,56 @@ class DataBase:
         if id != None:
             id = str(id).replace(",", "")
         return id
+    def searchLinkSong(self,nameSong):
+        sql= 'SELECT link FROM song WHERE name={}'
+        sql=sql.format(nameSong)
+        try:
+            self.cursor.execute(sql)
+            link= self.cursor.fetchone()
+        except Exception as e:
+            raise
+        return link
+
+    def searchsBands(self):
+        sql= 'SELECT name FROM band'
+        try:
+            self.cursor.execute(sql)
+            bands= self.cursor.fetchall()
+        except Exception as e:
+            raise
+        return bands
+
+    def searchIdbandUnion(self, name):
+        id = self.searchIdBand(name)
+        rta=id
+        if id != None:
+            sql = 'SELECT idSong FROM sinsong.union WHERE idBand= {}'
+            sql= sql.format(id)
+
+            try:
+                self.cursor.execute(sql)
+                ids = self.cursor.fetchone()
+                rta=ids
+            except Exception as e:
+                raise
+        return rta
+    def searchSongWithid(self,id):
+        sql='SELECT name FROM song WHERE id={}'
+        sql= sql.format(str(id).replace(",",""))
+        try:
+            self.cursor.execute(sql)
+            name= self.cursor.fetchone()
+        except Exception as e:
+            raise
+        return  name
+
+
 dataBase= DataBase()
 def addplus(text):
     text= str("'"+text+"'")
     return text
 
-def ingresarCancion(dataBase):
+def addSong(dataBase):
     print("-----------------------------")
     name= input("NAME SONG:")
     link= input("LINK:")
@@ -99,10 +144,38 @@ def ingresarCancion(dataBase):
         dataBase.addBand(band,type)
         idB = dataBase.searchIdBand(band)
 
+
+
     dataBase.addUnion(idB,idS)
 
+def correction(text):
+    text= str(text)
+    text=text.replace("('","")
+    text= text.replace("',)","")
+    return text
+#ingresarCancion(dataBase)
+def showSong(link):
+    o.open(link)
+def searchSong(database):
+    name = input("NAME SONG:")
+    name = addplus(name.lower())
+    link= database.searchLinkSong(name)
+    link= correction(link)
+    if link!= None:
+        showSong(link)
+    else:
+        print("the song doesn´t exist")
 
-ingresarCancion(dataBase)
+def searchBands(dataBase):
+    bands = dataBase.searchsBands()
+    for i in range(len(bands)):
+        print("*" + correction(bands[i]))
 
+def searchSongs(dataBase,name):
+    idSong = dataBase.searchIdbandUnion(name)
+    if idSong != None:
+        for i in range(len(idSong)):
+            name = dataBase.searchSongWithid(idSong[i])
+            print("*" + correction(name))
 
 
