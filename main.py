@@ -109,6 +109,7 @@ class DataBase:
 
 
 dataBase= DataBase()
+
 def addplus(text):
     text= str("'"+text+"'")
     return text
